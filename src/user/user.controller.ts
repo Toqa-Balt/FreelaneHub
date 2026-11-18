@@ -6,17 +6,13 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/guards.roles.js';
 import { Roles } from '../common/decoraters/Roles.decorater.js';
 import { enumRoles } from '../common/enums/enumRoles.js';
-import { CreateUserDto } from './dto/create-user.dto.js';
+
 @UseGuards(JwtAuthGuard , RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-@Roles(enumRoles.ADMIN)
-  @Post()
-  create(@Body() body : CreateUserDto) {
-    return this.userService.createUser(body);
-  }
+
 @Roles(enumRoles.ADMIN)
   @Get()
   findAll() {

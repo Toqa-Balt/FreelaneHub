@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/guards.roles.js';
 import { Roles } from '../common/decoraters/Roles.decorater.js';
 import { enumRoles } from '../common/enums/enumRoles.js';
-@UseGuards(JwtAuthGuard , RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('freelancer-profile')
 export class FreelancerProfileController {
   constructor(private readonly freelancerProfileService: FreelancerProfileService) { }
@@ -20,31 +20,32 @@ export class FreelancerProfileController {
     maxSizeMB: 2
   })
   @Roles(enumRoles.FREELANCER)
-  @Post()
-  create(@Body() body: CreateProfileDto,
+  @Patch('complete-profile')
+  complete(@Body() body: CreateProfileDto,
     @CurrentUser('id') id: number,
-    @UploadedFile() avatar: Express.Multer.File) {
+    @UploadedFile() avatar?: Express.Multer.File) {
 
-    const avatarUrl = `/uploads/public/freelancerProfile/${avatar.filename}`;
-    return this.freelancerProfileService.create(body, id, avatarUrl);
+    const avatarUrl = avatar ? `/uploads/public/freelancerProfile/${avatar.filename}` : undefined;
+    
+    return this.freelancerProfileService.completeProfile(body, id, avatarUrl);
 
   }
-  
+
   @Get()
   findAll() {
     return this.freelancerProfileService.findAll();
   }
- @Roles(enumRoles.FREELANCER)
+  @Roles(enumRoles.FREELANCER)
   @Get('me')
   myProfile(@CurrentUser('id') id: number) {
     return this.freelancerProfileService.findMe(+id);
   }
- @Roles(enumRoles.CLIENT)
+  @Roles(enumRoles.CLIENT)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.freelancerProfileService.findOne(+id);
   }
-@Roles(enumRoles.FREELANCER)
+  @Roles(enumRoles.FREELANCER)
   @UploadFile({
     fieldName: 'avatar',
     folder: 'public/freelancerProfile',
@@ -55,9 +56,9 @@ export class FreelancerProfileController {
   update(@CurrentUser('id') id: number,
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() avatar?: Express.Multer.File) {
-      const avatarUrl = avatar? `/uploads/public/freelancerProfile/${avatar.filename}` : undefined;
+    const avatarUrl = avatar ? `/uploads/public/freelancerProfile/${avatar.filename}` : undefined;
 
-    return this.freelancerProfileService.update(id, updateProfileDto,avatarUrl);
+    return this.freelancerProfileService.update(id, updateProfileDto, avatarUrl);
   }
 
 }

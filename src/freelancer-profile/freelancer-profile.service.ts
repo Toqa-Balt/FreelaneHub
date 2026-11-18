@@ -4,7 +4,7 @@ import { UpdateProfileDto } from './dto/update-freelancer-profile.dto.js';
 import { CreateProfileDto } from './dto/create-freelancer-profile.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { enumRoles } from '../common/enums/enumRoles.js';
-
+import * as path from 'path';
 
 import * as fs from 'fs'
 import { Prisma } from '../generated/prisma/client.js';
@@ -12,39 +12,26 @@ import { Prisma } from '../generated/prisma/client.js';
 export class FreelancerProfileService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(d: CreateProfileDto,
-    userId: number,
-    avatarUrl: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-        omit: { password: true },
-      });
+  async completeProfile(d: CreateProfileDto, userId: number, avatarUrl?: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      omit: { password: true },
+    });
 
-      if (!user) {
-        throw new NotFoundException(`User with ID #${userId} not found`);
+    if (!user) {
+      throw new NotFoundException(`User with ID #${userId} not found`);
+    }
+
+    return await this.prisma.freelancerProfile.update({
+      where: { userId },
+      data: {
+        ...d,
+        avatarUrl
       }
+    }) ;
 
-      return await this.prisma.freelancerProfile.create({
-        data: {
-          ...d,
-          userId,
-          avatarUrl
-        }
-
-      })
-    }catch (e) {
-  if (
-    e instanceof Prisma.PrismaClientKnownRequestError &&
-    e.code === 'P2002'
-  ) {
-    throw new ConflictException('you already have a damn profile');
   }
 
-  throw e;
-}
-     
-  }
 
   async findAll() {
     return this.prisma.freelancerProfile.findMany({
@@ -107,8 +94,20 @@ export class FreelancerProfileService {
       where: { userId },
       data
     })
-     if(oldUrl)
-     fs.unlinkSync(oldUrl) ;
+
+    if (oldUrl) {
+      const cleanRelativePath = oldUrl.startsWith('/') ? oldUrl.slice(1) : oldUrl;
+
+      const fullPath = path.join(process.cwd(), cleanRelativePath);
+
+      if (fs.existsSync(fullPath)) {
+        try {
+          fs.unlinkSync(fullPath);
+        } catch (err) {
+          console.error(`Failed to delete old attachment at ${fullPath}:`, err);
+        }
+      }
+    }
 
 
     return updated;

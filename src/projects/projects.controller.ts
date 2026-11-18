@@ -32,14 +32,16 @@ export class ProjectsController {
     return this.projectsService.create(body, id, attachmentPath);
   }
 
-  @Get()
-  findAll(@Query() query: FilterProjectDto) {
-    return this.projectsService.findAll(query);
-  }
-
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(enumRoles.CLIENT)
   @Get('my-projects')
   MyProjects(@CurrentUser('id') clientId: number) {
     return this.projectsService.myProjects(clientId);
+  }
+
+  @Get()
+  findAll(@Query() query: FilterProjectDto) {
+    return this.projectsService.findAll(query);
   }
 
   @Get(':id')

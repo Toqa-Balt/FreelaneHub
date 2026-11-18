@@ -1,23 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
-import { create } from 'domain';
+import { enumRoles } from '../common/enums/enumRoles.js';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService
   ) { }
 
-  async createUser(d: CreateUserDto) {
-    const user = await this.prisma.user.create({
-      data : {...d,
-        wallet : {
-          create : {}
+  async createUser(d: CreateUserDto, role: enumRoles) {
+    let user : any ;
+    if (role == enumRoles.CLIENT) {
+      user = await this.prisma.user.create({
+        data: {
+          ...d,
+          wallet: {
+            create: {}
+          }
         }
-      }
-    })
-    return user ;
-    
+      })
+    }
+
+    if (role == enumRoles.FREELANCER) {
+      user = await this.prisma.user.create({
+        data: {
+          ...d,
+          wallet: {
+            create: {},
+          },
+          freelancerProfile: {
+            create: {
+              bio: '' ,
+              hourlyRate: 0 ,
+            }
+          }
+        }
+      })
+    }
+      return user ;
   }
 
   async findAll() {
@@ -39,12 +59,12 @@ export class UserService {
     return user;
   }
 
-  async updateName(id: number, name : string) {
+  async updateName(id: number, name: string) {
     await this.findOne(id);
 
     return this.prisma.user.update({
       where: { id },
-      data: {name} , 
+      data: { name },
       omit: { password: true },
     });
   }
@@ -60,5 +80,5 @@ export class UserService {
     });
   }
 
-  
+
 }

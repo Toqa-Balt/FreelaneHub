@@ -13,7 +13,7 @@ import { ReferenceType } from '../common/enums/refrenceType.js';
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) { }
-  async create(createProjectDto: CreateProjectDto, userId: number, attachmentUrl?: string) {
+  async create(createProjectDto: CreateProjectDto, userId: number, attachmentPath?: string) {
     if (createProjectDto.budgetMin > createProjectDto.budgetMax) {
       throw new BadRequestException('budgetMin must be less than budgetMax');
     }
@@ -23,7 +23,7 @@ export class ProjectsService {
       data: {
         ...createProjectDto,
         clientId: userId,
-        attachmentUrl: attachmentUrl
+        attachmentPath: attachmentPath
       }
     })
 

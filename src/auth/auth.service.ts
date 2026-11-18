@@ -40,7 +40,7 @@ export class AuthService {
 
         d.password = await bcrypt.hash(d.password, 10);
 
-        const user = await this.userService.createUser(d)
+        const user = await this.userService.createUser(d , d.role) ;
 
         return {
             email: user.email,
@@ -204,7 +204,7 @@ export class AuthService {
             where: { id: sid }
         })
 
-        if (session?.expiresAt != null) throw new UnauthorizedException();
+        if (session?.revokedAt != null) throw new UnauthorizedException();
         return this.prisma.session.update({
             where: { id: sid },
             data: { revokedAt: new Date() },

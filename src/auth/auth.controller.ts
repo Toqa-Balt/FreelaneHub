@@ -53,6 +53,7 @@ export class AuthController {
   logout(@CurrentUser('sid') sid: number) {
     return this.authService.logout(sid);
   }
+  
   @UseGuards(JwtAuthGuard)
   @Post('logout-others')
   logoutOthers(
@@ -61,9 +62,10 @@ export class AuthController {
   ) {
     return this.authService.logoutOthers(userId, currentSid);
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('sessions')
-  getMyActiveSessions(@CurrentUser('userId') userId: number) {
+  getMyActiveSessions(@CurrentUser('id') userId: number) {
     return this.authService.activeSessions(userId);
   }
 
