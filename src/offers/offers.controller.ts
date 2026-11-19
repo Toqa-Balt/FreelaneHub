@@ -55,6 +55,7 @@ export class OffersController {
     return this.offersService.getOffersOnProject(projectId, clientId);
   }
 
+  @Roles(enumRoles.CLIENT , enumRoles.FREELANCER)
   @Get(':id')
   findOne(
     @Param('id', ParseIntPipe) id: number,

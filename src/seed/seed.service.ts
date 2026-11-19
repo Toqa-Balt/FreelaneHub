@@ -338,6 +338,7 @@ export class SeedService implements OnModuleInit {
       });
 
       console.log('Seeded successfully with 6 categories, 15 projects, demo accounts, and offers!');
+      
     }
   }
 

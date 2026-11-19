@@ -14,20 +14,27 @@ import { ReferenceType } from '../common/enums/refrenceType.js';
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) { }
   async create(createProjectDto: CreateProjectDto, userId: number, attachmentPath?: string) {
-    if (createProjectDto.budgetMin > createProjectDto.budgetMax) {
-      throw new BadRequestException('budgetMin must be less than budgetMax');
-    }
-
-    return await this.prisma.project.create({
-      omit: { attachmentPath: true },
-      data: {
-        ...createProjectDto,
-        clientId: userId,
-        attachmentPath: attachmentPath
-      }
-    })
-
+  if (createProjectDto.budgetMin > createProjectDto.budgetMax) {
+    throw new BadRequestException('budgetMin must be less than budgetMax');
   }
+
+  const category = await this.prisma.category.findUnique({
+    where: { id: createProjectDto.categoryId },
+  });
+
+  if (!category) {
+    throw new NotFoundException(`Category with ID ${createProjectDto.categoryId} not found`);
+  }
+
+  return await this.prisma.project.create({
+    omit: { attachmentPath: true },
+    data: {
+      ...createProjectDto,
+      clientId: userId,
+      attachmentPath: attachmentPath,
+    },
+  });
+}
 
   async findAll(q: FilterProjectDto) {
     const skip = (q.page - 1) * q.limit;
