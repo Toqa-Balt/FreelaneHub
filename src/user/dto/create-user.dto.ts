@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { enumRoles } from '../../common/enums/enumRoles.js';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString()
@@ -8,6 +9,9 @@ export class CreateUserDto {
 
   @IsEmail()
   @IsNotEmpty()
+  @Transform(
+  ({ value }) => value.toLowerCase()
+  )
   email: string;
 
   @IsString()

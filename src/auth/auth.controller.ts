@@ -79,7 +79,6 @@ export class AuthController {
   resetPassword(@Body() body : ResetPasswordDto , @Query('token') token : string ){
     return this.authService.resetPassword(body.newPassword , token) ;
 
-
   }
 
 

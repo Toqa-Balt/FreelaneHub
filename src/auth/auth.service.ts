@@ -239,6 +239,7 @@ export class AuthService {
         }
 
         const resetToken = randomBytes(32).toString('hex');
+        
         const hashedToken = this.hash(resetToken);
 
         const expiry = new Date(Date.now() + 15 * 60 * 1000);
@@ -251,7 +252,7 @@ export class AuthService {
             }
         })
 
-        const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+        const resetLink = `http://localhost:3000/auth/reset-password?token=${resetToken}`;
 
         await this.mailService.sendResetPasswordEmail(user.email, resetLink);
 
